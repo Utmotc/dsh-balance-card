@@ -1,0 +1,9 @@
+node_modules/
+*.log
+*.bak
+*.bak-*
+.DS_Store
+Thumbs.db
+# Transient profile state, if you happen to test inside the repo
+.plugin-manager/
+cordis.snapshot.yml

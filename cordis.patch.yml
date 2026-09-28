@@ -1,0 +1,20 @@
+# dsh-plugin-balance bundle patch.
+#
+# Installing this package as a profile bundle applies this file, which inserts the
+# plugin's own loader row. That is all it takes: the plugin manager adds a newly
+# installed bundle to `dsh.profile.bundles` by itself, so the row appears and its
+# switch in the plugin page toggles this plugin for real.
+- insert:
+    - id: balance-monitor
+      name: dsh-plugin-balance
+      config:
+        # Credential reference holding the DeepSeek key; every other provider
+        # names its own through the settings sections. Optional — the defaults
+        # below are what a bare install uses.
+        # apiKeyEnv: DEEPSEEK_API_KEY
+        # baseURL: https://api.deepseek.com   # or set $DEEPSEEK_BASE_URL
+        # timeoutMs: 15000                    # per-request timeout against the provider
+        # minIntervalMs: 2000                 # floor between two upstream reads of one provider
+        # okTtlMs: 60000                      # how long a good reading is reused
+        # errorTtlMs: 15000                   # how long a failed reading is reused
+        # defaultProvider: deepseek           # answered when a request names none

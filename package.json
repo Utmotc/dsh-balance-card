@@ -1,0 +1,63 @@
+{
+  "name": "dsh-plugin-balance",
+  "version": "1.2.4",
+  "description": "Provider API balance as an always-visible dsh Web sidebar card (or the original composer pill): the balance of the provider behind the model this conversation uses, with per-package percentage bars, correct units for money vs credits, a settings tab, and the WorkBuddy/Qoder credit that dsh-workbuddy-connect and dsh-qoder-connect report.",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "assets",
+    "locale",
+    "test",
+    "providers.json",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "LICENSE-dsh-model-balance"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "icon": "./assets/icon.svg",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "bundle",
+    "balance",
+    "billing",
+    "quota",
+    "deepseek",
+    "stepfun",
+    "kimi",
+    "openrouter",
+    "minimax",
+    "xai",
+    "workbuddy",
+    "qoder"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Utmotc/dsh-plugin-balance.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Utmotc/dsh-plugin-balance/issues"
+  },
+  "homepage": "https://github.com/Utmotc/dsh-plugin-balance#readme",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}
