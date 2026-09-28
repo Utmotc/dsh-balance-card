@@ -54,14 +54,17 @@ https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
 更喜欢终端的话，等价的手动操作：
 
 ```bash
-# 转发到 profile 内的 pnpm；profile 不存在时同样会创建
+# 发布至 npm 后支持短命令安装
+dsh plugin --profile web add dshbalance
+
+# 或直接通过 GitHub 归档包安装
 dsh plugin --profile web add https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
 ```
 
 这只安装**依赖**。激活是单独一步——CLI 不会动 `dsh.profile.bundles`（实测 manifest 原样返回）。两种方式任选收尾：
 
 - 打开插件页：包已列为 bundle，开关是**关**的——打开它；或
-- 自己把 `"dsh-plugin-balance"` 加进 `$DSH_HOME/profiles/web/package.json` 的 `dsh.profile.bundles`。
+- 自己把 `"dshbalance"` 加进 `$DSH_HOME/profiles/web/package.json` 的 `dsh.profile.bundles`。
 
 插件页自己的安装框一步做完两件事，所以它是推荐路径。
 

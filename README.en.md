@@ -63,14 +63,17 @@ Upgrades: pnpm caches by spec string, so after you push a change, uninstall and 
 Manual equivalent, if you prefer a terminal:
 
 ```bash
-# forwards to pnpm inside the profile; a missing profile is created the same way
+# Once published to npm, install using the short package name
+dsh plugin --profile web add dshbalance
+
+# Or install directly from GitHub tarball
 dsh plugin --profile web add https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
 ```
 
 This installs the **dependency only**. Activating it is a separate step — the CLI does not touch `dsh.profile.bundles` (measured: the manifest comes back unchanged). Finish either way:
 
 - open the plugin page: the package is now listed as a bundle with its switch **off** — turn it on; or
-- add `"dsh-plugin-balance"` to `dsh.profile.bundles` in `$DSH_HOME/profiles/web/package.json` yourself.
+- add `"dshbalance"` to `dsh.profile.bundles` in `$DSH_HOME/profiles/web/package.json` yourself.
 
 The plugin page's own install field does both steps at once, which is why it is the recommended path.
 

@@ -1,5 +1,5 @@
 {
-  "name": "dsh-plugin-balance",
+  "name": "dshbalance",
   "version": "1.3.1",
   "description": "Provider API balance and subscription quotas as an always-visible dsh Web sidebar card (or the original composer pill): the balance of the provider behind the model this conversation uses, with per-package percentage bars, correct units for money vs credits vs quotas, a settings tab, WorkBuddy/Qoder credits, and dsh-plugin-subscriptions (ChatGPT, Claude, Grok, Copilot, Antigravity) quota monitoring.",
   "license": "MIT",
