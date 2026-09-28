@@ -253,6 +253,10 @@ const load = (route, options = {}) => {
     settingsPosts: [],
     settingsRequests: [],
     settingsStatus: options.settingsStatus ?? 200,
+    // The dsh-plugin-subscriptions channel: calls are recorded here and answered
+    // by `subscriptionsHandler` when a test installs one.
+    subscriptionCalls: [],
+    subscriptionsHandler: options.subscriptionsHandler,
   }
   const seat = domNode('div')
   const stack = domNode('div')
@@ -330,6 +334,32 @@ const load = (route, options = {}) => {
           ok: true,
           status: 200,
           json: async () => ({ ok: true, value: state.settings, defaults: SETTINGS_DEFAULT }),
+        }
+      }
+      // The dsh-plugin-subscriptions channel: the envelope in, the envelope out.
+      // The business answer rides `result`, one level down, exactly as the real
+      // `server-response` envelope carries it; `subscriptionsHandler` returns the
+      // BUSINESS value and the harness wraps it into the response envelope.
+      if (String(url).startsWith('/api/subscriptions-auth.')) {
+        const envelope = JSON.parse(init?.body ?? '{}')
+        state.subscriptionCalls.push({
+          endpoint: String(url).slice('/api/subscriptions-auth.'.length),
+          payload: envelope.payload,
+          method: envelope.method,
+        })
+        const handler = state.subscriptionsHandler
+        const answer =
+          handler === undefined
+            ? { ok: false, error: { code: 'internal', message: 'no handler in test', details: {} } }
+            : handler(envelope.payload ?? {})
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            type: 'server-response',
+            rpcId: envelope.rpcId,
+            result: answer,
+          }),
         }
       }
       requests.push(url)
@@ -1390,6 +1420,234 @@ const main = async () => {
     const pillText = (await seatOf(harness, await pill.render())).text
     console.log('U qoder-unlimited pill:', JSON.stringify(pillText))
     assert.strictEqual(pillText, '\ud83c\udfabQoder\u79ef\u5206 100', 'the pill states the figure, not the flag')
+  }
+
+  // V: dsh-plugin-subscriptions. The provider routes that plugin serves are
+  // answered in the browser, straight from its `/api/subscriptions-auth.*`
+  // channel — never from the host route. The collapsed readout follows the
+  // default account's tightest window; the panel lists every account, and the
+  // refresh action issues a forced `usage` call.
+  {
+    const STATUS = {
+      providers: {
+        codex: { busy: false, accounts: [{ key: 'acct-1', isDefault: true, account: 'user@example.com', plan: 'plus' }] },
+        claude: { busy: false, accounts: [] },
+      },
+    }
+    const USAGE = {
+      supported: true,
+      windows: [
+        { kind: 'session', usedPercent: 25, resetsAt: Date.now() + 3 * 3600 * 1000 },
+        { kind: 'weekly', usedPercent: 60, resetsAt: Date.now() + 5 * 24 * 3600 * 1000 },
+      ],
+    }
+    const DIRECTORY_CODEX = {
+      current: { provider: 'codex', model: 'gpt-5.6-sol' },
+      groups: [
+        { id: 'deepseek-official', name: 'DeepSeek' },
+        { id: 'codex', name: 'ChatGPT (Codex)' },
+      ],
+      routable: true,
+      status: 'ready',
+    }
+    let usageForced = false
+    const subscriptionsHandler = (payload) => {
+      // The same handler answers both endpoints by the request's `method`
+      // field — exactly how the node half's route table dispatches.
+      if (payload.provider === undefined) {
+        return { ok: true, value: { providers: STATUS.providers } }
+      }
+      void usageForced
+      return { ok: true, value: USAGE }
+    }
+    const harness = load((url) => assert.fail(url), { subscriptionsHandler })
+    const monitor = harness.mount({ settings: COMPOSER, models: modelsStub(store(DIRECTORY_CODEX), store(CATALOG)) })
+    await monitor.attachSession('session-1')
+    const tree = await monitor.render()
+    assert.ok(tree.__portal, 'the subscription pill renders in the stats row')
+    const { seat, text } = await seatOf(harness, tree)
+    console.log('V pill:', JSON.stringify(text))
+    assert.strictEqual(text, '#ChatGPT (Codex)\u5269\u4f59 40% \u00b7 user@example.com', 'the pill follows the default account (tightest window: 40% left)')
+
+    // The two endpoints were called on the shared channel, in order, and the
+    // host balance route was never asked.
+    const endpoints = harness.state.subscriptionCalls.map((call) => call.endpoint)
+    assert.ok(endpoints.includes('status'), 'status was asked')
+    assert.ok(endpoints.includes('usage'), 'usage was asked')
+    assert.strictEqual(harness.requests.length, 0, 'the host route is never called for a subscription provider')
+    const usageCall = harness.state.subscriptionCalls.find((call) => call.endpoint === 'usage')
+    assert.strictEqual(usageCall.payload.provider, 'codex')
+    assert.strictEqual(usageCall.payload.account, 'acct-1')
+
+    // Clicking the pill opens the per-account panel with both windows.
+    const pill = find(seat, (n) => n.type === 'button' && n.props['aria-haspopup'] === 'dialog')
+    assert.ok(pill !== null, 'the subscription pill is a dialog trigger')
+    pill.props.onClick()
+    const element = seatsOf(tree)[0]
+    const opened = await settle(harness.mini, element.type, element.props)
+    const panel = texts(find(opened, (n) => n.props?.role === 'dialog')).join('')
+    console.log('V panel:', JSON.stringify(panel))
+    for (const expected of ['user@example.com \u00b7 plus', '5 \u5c0f\u65f6', '7 \u5929', '\u5df2\u7528 25% \u00b7 \u5269\u4f59 75%', '\u5df2\u7528 60% \u00b7 \u5269\u4f59 40%', '\u5382\u5546']) {
+      assert.ok(panel.includes(expected), 'the subscription panel must contain ' + expected)
+    }
+  }
+
+  // V2: a subscription provider with no logged-in account reads as signed-out,
+  // not as a failure — the same vocabulary the credit sources use.
+  {
+    const STATUS = { providers: { codex: { busy: false, accounts: [] }, claude: { busy: false, accounts: [] } } }
+    const DIRECTORY_CODEX = {
+      current: { provider: 'codex', model: 'gpt-5.6-sol' },
+      groups: [{ id: 'codex', name: 'ChatGPT (Codex)' }],
+      routable: true,
+      status: 'ready',
+    }
+    const subscriptionsHandler = () => ({ ok: true, value: { providers: STATUS.providers } })
+    const harness = load((url) => assert.fail(url), { subscriptionsHandler })
+    const monitor = harness.mount({ settings: COMPOSER, models: modelsStub(store(DIRECTORY_CODEX), store(CATALOG)) })
+    await monitor.attachSession('session-1')
+    const { text } = await seatOf(harness, await monitor.render())
+    console.log('V2 signed-out pill:', JSON.stringify(text))
+    assert.strictEqual(text, '\u00a4ChatGPT (Codex)\u672a\u767b\u5f55', 'no accounts reads as signed out')
+  }
+
+  // V3: the subscription plugin being absent entirely (404-ish channel error)
+  // reads as unreachable, never as a crash.
+  {
+    const DIRECTORY_CODEX = {
+      current: { provider: 'codex', model: 'gpt-5.6-sol' },
+      groups: [{ id: 'codex', name: 'ChatGPT (Codex)' }],
+      routable: true,
+      status: 'ready',
+    }
+    const harness = load((url) => assert.fail(url))
+    const monitor = harness.mount({ settings: COMPOSER, models: modelsStub(store(DIRECTORY_CODEX), store(CATALOG)) })
+    await monitor.attachSession('session-1')
+    const { text } = await seatOf(harness, await monitor.render())
+    console.log('V3 missing plugin pill:', JSON.stringify(text))
+    assert.strictEqual(text, '\u00a4ChatGPT (Codex)\u8bfb\u53d6\u5931\u8d25', 'a missing subscription plugin reads as a failed read')
+  }
+
+  // V4: the refresh action forces the `usage` read, bypassing the server's
+  // five-minute cache — the same `force` flag the plugin's own badge sends.
+  {
+    const STATUS = {
+      providers: {
+        codex: { busy: false, accounts: [{ key: 'acct-1', isDefault: true, account: 'user@example.com' }] },
+      },
+    }
+    const USAGE = {
+      supported: true,
+      windows: [{ kind: 'session', usedPercent: 25, resetsAt: Date.now() + 3 * 3600 * 1000 }],
+    }
+    const DIRECTORY_CODEX = {
+      current: { provider: 'codex', model: 'gpt-5.6-sol' },
+      groups: [{ id: 'codex', name: 'ChatGPT (Codex)' }],
+      routable: true,
+      status: 'ready',
+    }
+    let lastUsage = undefined
+    const subscriptionsHandler = (payload) => {
+      if (payload.provider === undefined) return { ok: true, value: { providers: STATUS.providers } }
+      lastUsage = payload
+      return { ok: true, value: USAGE }
+    }
+    const harness = load((url) => assert.fail(url), { subscriptionsHandler })
+    const monitor = harness.mount({ settings: COMPOSER, models: modelsStub(store(DIRECTORY_CODEX), store(CATALOG)) })
+    await monitor.attachSession('session-1')
+    const tree = await monitor.render()
+    const { seat } = await seatOf(harness, tree)
+    const pill = find(seat, (n) => n.type === 'button' && n.props['aria-haspopup'] === 'dialog')
+    pill.props.onClick()
+    const element = seatsOf(tree)[0]
+    const opened = await settle(harness.mini, element.type, element.props)
+    const refresh = find(opened, (n) => n.type === 'button' && n.props['aria-label'] === '\u5237\u65b0\u4f59\u989d')
+    assert.ok(refresh !== null, 'the panel carries the refresh button')
+    assert.strictEqual(lastUsage.force, undefined, 'the first read is not forced')
+    refresh.props.onClick()
+    // The refresh bumps the read nonce, which the harness observes on the next
+    // settle of the same component instance.
+    await settle(harness.mini, seatsOf(tree)[0].type, seatsOf(tree)[0].props)
+    assert.strictEqual(lastUsage.force, true, 'the refresh read is forced')
+  }
+
+  // V5: CARD CAP. A readout with many windows (several accounts, or per-model
+  // lanes) must not stretch the sidebar: the collapsed card draws at most
+  // three window bars and states the cut count, while the detail panel keeps
+  // listing every window.
+  {
+    const STATUS = {
+      providers: {
+        antigravity: {
+          busy: false,
+          accounts: [
+            { key: 'acct-1', isDefault: true, account: 'a@gmail.com', plan: 'Google AI Pro' },
+            { key: 'acct-2', isDefault: false, account: 'b@gmail.com', plan: 'Google AI Pro' },
+          ],
+        },
+      },
+    }
+    // Two accounts × three windows each = six window bars, far past three.
+    const windowsOf = (offset) =>
+      ['gemini-3-pro', 'gemini-3-flash', 'claude-sonnet-4-6'].map((model, index) => ({
+        kind: 'other',
+        scope: model,
+        usedPercent: 10 * (index + 1) + offset,
+        resetsAt: Date.now() + (index + 1) * 3600 * 1000,
+      }))
+    const subscriptionsHandler = (payload) => {
+      if (payload.provider === undefined) return { ok: true, value: { providers: STATUS.providers } }
+      return { ok: true, value: { supported: true, windows: windowsOf(payload.account === 'acct-1' ? 0 : 50), plan: 'Google AI Pro' } }
+    }
+    const DIRECTORY_ANTIGRAVITY = {
+      current: { provider: 'antigravity', model: 'gemini-3-pro' },
+      groups: [{ id: 'antigravity', name: 'Google Antigravity' }],
+      routable: true,
+      status: 'ready',
+    }
+    const harness = load((url) => assert.fail(url), { subscriptionsHandler })
+    const monitor = harness.mount({ settings: SIDEBAR, models: modelsStub(store(DIRECTORY_ANTIGRAVITY), store(CATALOG)) })
+    await monitor.attachSession('session-1')
+    const card = await monitor.renderSidebar()
+    const cardText = texts(card).join('')
+    console.log('V5 capped card:', JSON.stringify(cardText))
+    // Exactly three window bars are drawn: the default account's three windows.
+    for (const expected of ['a@gmail.com \u00b7 Google AI Pro', 'gemini-3-pro', 'gemini-3-flash', 'claude-sonnet-4-6']) {
+      assert.ok(cardText.includes(expected), 'the capped card must show the default account\u2019s windows (' + expected + ')')
+    }
+    assert.ok(
+      !cardText.includes('b@gmail.com'),
+      'the second account\u2019s windows are cut from the collapsed card',
+    )
+    assert.ok(cardText.includes('\u8fd8\u6709 3 \u9879'), 'the cut count is stated')
+    assert.ok(cardText.includes('\u70b9\u5361\u67e5\u770b\u5168\u90e8'), 'the pointer to the detail panel is stated')
+
+    // The bars on the card: three window fills only.
+    const bars = []
+    const collectBars = (node) => {
+      if (node === null || typeof node !== 'object') return
+      if (Array.isArray(node)) return node.forEach(collectBars)
+      if (node.props?.className === 'dshBal_bar') bars.push(node)
+      if (node.props) collectBars(node.props.children)
+    }
+    collectBars(card)
+    assert.strictEqual(bars.length, 3, 'exactly three window bars on the collapsed card')
+
+    // Opening the panel lists every account and every window, all six bars' data.
+    card.props.onClick()
+    const opened = await monitor.rerenderSidebar()
+    const panelText = texts(find(opened, (n) => n.props?.role === 'dialog')).join('')
+    console.log('V5 panel:', JSON.stringify(panelText))
+    for (const expected of ['a@gmail.com', 'b@gmail.com']) {
+      assert.ok(panelText.includes(expected), 'the panel lists both accounts (' + expected + ')')
+    }
+    for (const model of ['gemini-3-pro', 'gemini-3-flash', 'claude-sonnet-4-6']) {
+      assert.ok(panelText.includes(model), 'the panel lists every window (' + model + ')')
+    }
+    // Six window rows in the panel: each account lists its own window set
+    // (the window name also appears in its 重置 row, so count those pairs).
+    const occurrences = panelText.split('gemini-3-pro').length - 1
+    assert.strictEqual(occurrences, 4, 'each account lists its own window set (window row + its reset row)')
   }
 
   console.log('OK: boot-safe activation, one pill following the selected model, placement, degradation and panels verified')

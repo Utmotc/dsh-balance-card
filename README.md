@@ -16,6 +16,7 @@
 
 - **六家厂商，各自的官方账单接口**——DeepSeek、StepFun、Kimi Coding、OpenRouter、MiniMax、xAI/Grok——外加你在 `providers.json` 里声明的任意厂商。
 - **WorkBuddy 与 Qoder 的积分，不重复实现。** 选中 `workbuddy` / `workbuddy-ai` 或 `qoder` / `qoder-global` 模型组时，显示的是 `dsh-workbuddy-connect` / `dsh-qoder-connect` 已经发布在自己状态路由上的剩余积分。
+- **兼容 dsh-plugin-subscriptions 订阅额度。** 选中 **ChatGPT (Codex)**、**Claude**、**Grok (X Premium)**、**GitHub Copilot** 或 **Google Antigravity** 时，直接呈现其订阅配额、重置时间与模型额度。
 - **单位绝不混用。** 钱说 元 / `¥` / `$`；积分说 积分，带自己的标记。无法辨认单位的数字显示为 `单位未知` 加通用符号 `¤`，而不是猜成元——把 1,000 积分印成 `¥1,000` 是在谎报余额。
 - **一个 `余额监测` 设置页。** 显示位置（侧边栏卡片 / 输入框胶囊 / 两处 / 都不显示）、轮询间隔、告警阈值、单位写法、更新时间、千位分隔——全部写入本插件自己的文件，不触发 loader 重建、不需要重启。
 - **密钥只留在宿主。** 浏览器半边只收到数字。
@@ -35,7 +36,7 @@ https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
 这是当前 `main`。要可复现的安装，用 tag：
 
 ```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.2.4.tar.gz
+https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.0.tar.gz
 ```
 
 仓库地址（`https://github.com/Utmotc/dsh-plugin-balance`）也可以，但 pnpm 会把它按 **git** 依赖解析，机器上需要有 `git`；`archive/.../main.tar.gz` 形式是纯 HTTPS 下载。
@@ -91,8 +92,19 @@ dsh plugin --profile web add https://github.com/Utmotc/dsh-plugin-balance/archiv
 | xAI / Grok | `GET /v1/dashboard/billing/credit_grants` | 金额 $ |
 | WorkBuddy / WorkBuddy AI | `dsh-workbuddy-connect` 自己的状态路由 | 积分 |
 | Qoder / Qoder Global | `dsh-qoder-connect` 自己的状态路由 | 积分 |
+| ChatGPT (Codex) | `dsh-plugin-subscriptions` RPC 通道 | 订阅额度（5 小时 / 7 天） |
+| Claude | `dsh-plugin-subscriptions` RPC 通道 | 订阅额度（5 小时 / 7 天） |
+| Grok (X Premium) | `dsh-plugin-subscriptions` RPC 通道 | 订阅额度（2 小时窗口） |
+| GitHub Copilot | `dsh-plugin-subscriptions` RPC 通道 | 订阅额度（高级请求每月） |
+| Google Antigravity | `dsh-plugin-subscriptions` RPC 通道 | 订阅额度（各模型独立配额） |
 
-**没有 API 级账单的厂商**——OpenAI 与 Anthropic（只有管理员密钥的用量/成本报表）、Together AI（用量），以及 Qwen、小米 MiMo、百川、Mistral、Groq、Cohere（只在控制台）——显示「暂不支持」，有控制台链接的会给出链接。
+**没有 API 级账单的厂商**——OpenAI 与 Anthropic 的纯 API Key 模式（只有管理员密钥的用量/成本报表）、Together AI（用量），以及 Qwen、小米 MiMo、百川、Mistral、Groq、Cohere（只在控制台）——显示「暂不支持」，有控制台链接的会给出链接。
+
+### 订阅来源：与 dsh-plugin-subscriptions 联动
+
+`codex`、`claude`、`grok`、`copilot`、`antigravity` 的额度来自用户的 Web 登录会话或 OAuth 授权，由 `dsh-plugin-subscriptions` 提供。
+- **浏览器端直接接入**：通过该插件自带的 `subscriptions-auth` RPC 通道在前端直接获取实时配额与重置时间，无需宿主端发起上游接口调用，也不触碰账号凭证。
+- **智能避让与防歧义**：宿主端将这些 route id 的纯 API Key 查询安全拦截（避免误将 Grok X Premium 订阅与 xAI API Key 额度混淆），当用户未安装该插件或未登录时，优雅降级为 `未登录` 或 `读取失败` 状态。
 
 ### 积分来源：复读，而不是重新实现
 

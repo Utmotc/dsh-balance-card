@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.0
+
+- **Feature: full support for `dsh-plugin-subscriptions` monitoring.**
+  When using models from **ChatGPT (Codex)**, **Claude**, **Grok (X Premium)**,
+  **GitHub Copilot**, or **Google Antigravity**, the plugin now seamlessly renders
+  their active subscription quotas, per-model allowance bars, reset countdowns,
+  and account details directly in the sidebar card and detail panel.
+- **Architecture: browser-side subscription delegation.**
+  Subscription routes (`codex`, `claude`, `grok`, `copilot`, `antigravity`) are answered
+  directly through `dsh-plugin-subscriptions`'s client RPC channel (`subscriptions-auth`),
+  accurately reflecting web session quotas and OAuth-backed allowances without duplicating
+  login states or fabricating host API requests.
+- **Refinement: alias resolution and safe degradation.**
+  The host route rejects bare API key queries for subscription-handled provider ids
+  to avoid ambiguity (e.g. clearly distinguishing between an xAI API token and a Grok
+  X Premium subscription). Refusals degrade cleanly to `未登录` / `读取失败` states
+  when the subscription plugin is unauthenticated or not installed.
+
 ## 1.2.4
 
 - **Fixed: settings overrides never took effect.** The host half read the

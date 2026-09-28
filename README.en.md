@@ -23,6 +23,7 @@ Switching models switches the card with it. Clicking the card opens the detail p
 
 - **Six providers, their official billing endpoints** — DeepSeek, StepFun, Kimi Coding, OpenRouter, MiniMax, xAI/Grok — plus any provider you declare in `providers.json`.
 - **WorkBuddy and Qoder credit, without re-implementing them.** Selecting the `workbuddy` / `workbuddy-ai` or `qoder` / `qoder-global` model group shows the remaining credit that `dsh-workbuddy-connect` / `dsh-qoder-connect` already publishes on their own status routes.
+- **Support for dsh-plugin-subscriptions.** Selecting **ChatGPT (Codex)**, **Claude**, **Grok (X Premium)**, **GitHub Copilot**, or **Google Antigravity** presents their active subscription quotas, per-model usage bars, and reset countdowns directly.
 - **Units are never conflated.** Money says 元, `¥`, `$`; credits say 积分 and carry their own mark. A figure with no identifiable unit is shown as `单位未知` with the generic `¤` sign rather than being guessed as yuan — because printing 1,000 credits as `¥1,000` would misstate the balance.
 - **A `余额监测` settings tab.** Placement (sidebar card / composer pill / both / none), poll interval, warning threshold, unit style, updated-time, and digit grouping — all written to this plugin's own file, with no loader reconcile and no restart.
 - **Keys stay on the host.** The browser half only ever receives a number.
@@ -44,7 +45,7 @@ https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
 That is the current `main`. For a reproducible install, use a tag instead:
 
 ```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.2.4.tar.gz
+https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.0.tar.gz
 ```
 
 The repository URL (`https://github.com/Utmotc/dsh-plugin-balance`) works too, but pnpm resolves it as a **git** dependency, so it needs `git` on the machine; the `archive/.../main.tar.gz` form is a plain HTTPS download.
@@ -100,8 +101,19 @@ If your settings name a different variable, or you route a provider through a ga
 | xAI / Grok | `GET /v1/dashboard/billing/credit_grants` | amount $ |
 | WorkBuddy / WorkBuddy AI | `dsh-workbuddy-connect`'s own status route | credits |
 | Qoder / Qoder Global | `dsh-qoder-connect`'s own status route | credits |
+| ChatGPT (Codex) | `dsh-plugin-subscriptions` RPC channel | subscription quota (5-hour + 7-day) |
+| Claude | `dsh-plugin-subscriptions` RPC channel | subscription quota (5-hour + 7-day) |
+| Grok (X Premium) | `dsh-plugin-subscriptions` RPC channel | subscription quota (2-hour rolling) |
+| GitHub Copilot | `dsh-plugin-subscriptions` RPC channel | subscription quota (monthly premium requests) |
+| Google Antigravity | `dsh-plugin-subscriptions` RPC channel | subscription quota (per-model allowances) |
 
-**Providers with no API-level billing** — OpenAI and Anthropic (admin-key usage/cost reports only), Together AI (usage), and Qwen, Xiaomi MiMo, Baichuan, Mistral, Groq, Cohere (console only) — show «not supported», with the console link when there is one.
+**Providers with no API-level billing** — OpenAI and Anthropic in API key mode (admin-key usage/cost reports only), Together AI (usage), and Qwen, Xiaomi MiMo, Baichuan, Mistral, Groq, Cohere (console only) — show «not supported», with the console link when there is one.
+
+### Subscription sources: delegated to dsh-plugin-subscriptions
+
+Quotas for `codex`, `claude`, `grok`, `copilot`, and `antigravity` originate from browser-authenticated sessions or OAuth tokens managed by `dsh-plugin-subscriptions`.
+- **Direct browser RPC**: The client queries `subscriptions-auth` directly for real-time limits and reset windows without host-side upstream requests or handling login credentials.
+- **Collision avoidance**: The host route explicitly rejects bare API key queries for these provider ids (e.g. keeping Grok X Premium subscription distinct from xAI API credit), cleanly degrading to `未登录` (signed out) or `读取失败` when unauthenticated or uninstalled.
 
 ### Credit sources: re-read, not re-implemented
 

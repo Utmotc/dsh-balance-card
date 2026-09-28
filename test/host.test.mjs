@@ -264,6 +264,8 @@ assert.deepEqual(plugin.inject, [], 'nothing may be required: a rename must not 
 }
 
 // D: every documented provider resolves to its own endpoint and parses its own shape.
+// grok is no longer among them: it is a subscription route answered in the
+// browser (see T), so only the bare xAI key keeps its own endpoint here.
 {
 	const expected = {
 		deepseek: ['https://api.deepseek.com/user/balance', 'currency'],
@@ -272,7 +274,6 @@ assert.deepEqual(plugin.inject, [], 'nothing may be required: a rename must not 
 		openrouter: ['https://openrouter.ai/api/v1/auth/key', 'currency'],
 		minimax: ['https://api.minimax.chat/v1/token_plan/remains', 'quota'],
 		xai: ['https://api.x.ai/v1/dashboard/billing/credit_grants', 'currency'],
-		grok: ['https://api.x.ai/v1/dashboard/billing/credit_grants', 'currency'],
 	}
 	const seen = {}
 	for (const [provider, [url, kind]] of Object.entries(expected)) {
@@ -695,6 +696,21 @@ assert.deepEqual(plugin.inject, [], 'nothing may be required: a rename must not 
 	const quota = (await ask(kimi.route, 'provider=kimi-coding')).body
 	assert.equal(quota.value.unit, 'requests', 'a quota reading declares its own unit')
 	console.log('S ok: every reading states its unit')
+}
+
+// T: the subscription routes. dsh-plugin-subscriptions serves codex, claude,
+// grok, copilot and antigravity; its usage is read in the BROWSER, straight
+// from that plugin's own RPC channel, so the host route must never answer for
+// these ids — not even grok, whose API-billing alias exists for a bare xAI key.
+{
+	const { route } = mountRoute({ respond: () => jsonResponse({ unexpected: true }) })
+	for (const provider of ['codex', 'claude', 'grok', 'copilot', 'antigravity']) {
+		const { body } = await ask(route, `provider=${provider}`)
+		assert.equal(body.ok, true, `${provider} answers`)
+		assert.deepEqual(body.value, { queryable: false, reason: 'no-balance-api', provider }, `${provider} is refused, not read upstream`)
+	}
+	assert.equal(calls.length, 0, 'no upstream billing call is ever made for a subscription route')
+	console.log('T ok: subscription routes are left to the browser half (grok included)')
 }
 
 console.log('\nOK: route contract, provider resolution, settings overrides, cache and failure shapes verified')
