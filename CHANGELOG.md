@@ -2,6 +2,10 @@
 
 ## 1.3.1
 
+- **Fix: clean subscription progress bar and percentage layout.**
+  Removed the redundant middle "剩余 xx%" text on collapsed subscription cards,
+  aligning progress percentages cleanly in the right column to match the credit bars'
+  layout and avoid cluttered text.
 - **Refinement: Antigravity shared-pool folding on collapsed sidebar card.**
   When Google Antigravity reports multiple `gemini-*` model windows, their quotas
   belong to the same shared pool and move together. The collapsed sidebar card now
@@ -9,6 +13,7 @@
   share and earliest reset time, preventing repetitive entries from overflowing
   the card. The full list of individual models and lanes remains accessible in
   the detail panel.
+- **Release: officially published to npm as `@utmotc/dshbalance`.**
 
 ## 1.3.0
 

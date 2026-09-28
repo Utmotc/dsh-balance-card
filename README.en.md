@@ -36,46 +36,42 @@ Switching models switches the card with it. Clicking the card opens the detail p
 
 Requires **dsh 0.1.7 or newer**, Node **22.19+** (or 24+) — the same requirement dsh itself has.
 
+### Option 1: One-liner CLI install via npm (Recommended)
+
+This plugin is published on the official npm registry. Install it directly from your terminal:
+
+```bash
+dsh plugin --profile web add @utmotc/dshbalance
+```
+
+> If using the community `dsh1024` CLI wrapper:
+> `dsh1024 plugin --profile web add @utmotc/dshbalance`
+
+### Option 2: Install via the Web GUI
+
 In the dsh Web GUI, open the **plugin page** in the sidebar, paste one of these into the install field, and confirm:
 
-```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
-```
+- **npm package spec** (Recommended):
+  ```
+  @utmotc/dshbalance
+  ```
+- **Or GitHub release archive**:
+  ```
+  https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
+  ```
 
-That is the current `main`. For a reproducible install, use a tag instead:
-
-```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
-```
-
-The repository URL (`https://github.com/Utmotc/dsh-plugin-balance`) works too, but pnpm resolves it as a **git** dependency, so it needs `git` on the machine; the `archive/.../main.tar.gz` form is a plain HTTPS download.
-
-Installing does three things on its own:
+Installing automatically does three things:
 
 1. `pnpm add`s the package into `$DSH_HOME/profiles/web`;
 2. finds its `dsh.bundle.patch` and adds the package to `dsh.profile.bundles` — **activation is automatic**;
 3. applies the bundle patch, which inserts the plugin's loader row.
 
-Then switch it on or off from the same page. A package that declares **no** `dsh.bundle` is installed as a plain dependency and never activated — that is the one thing a plugin must get right, and this one does.
+Then switch it on or off from the same page. A package that declares `dsh.bundle` will appear under bundles properly.
 
-Upgrades: pnpm caches by spec string, so after you push a change, uninstall and reinstall the package in the plugin page (or install a fresh tag). Pinning a tag per release avoids the question entirely.
-
-Manual equivalent, if you prefer a terminal:
-
+Upgrades: Since it is on npm, subsequent updates can be done with one command:
 ```bash
-# Once published to npm, install using the short package name
-dsh plugin --profile web add @utmotc/dshbalance
-
-# Or install directly from GitHub tarball
-dsh plugin --profile web add https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
+dsh plugin --profile web add @utmotc/dshbalance@latest
 ```
-
-This installs the **dependency only**. Activating it is a separate step — the CLI does not touch `dsh.profile.bundles` (measured: the manifest comes back unchanged). Finish either way:
-
-- open the plugin page: the package is now listed as a bundle with its switch **off** — turn it on; or
-- add `"@utmotc/dshbalance"` to `dsh.profile.bundles` in `$DSH_HOME/profiles/web/package.json` yourself.
-
-The plugin page's own install field does both steps at once, which is why it is the recommended path.
 
 ## Where the keys come from
 

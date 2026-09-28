@@ -27,19 +27,29 @@
 
 需要 **dsh 0.1.7 或更新**，Node **22.19+**（或 24+）——与 dsh 本体的要求一致。
 
+### 方式一：终端命令行一键安装（推荐）
+
+本插件已正式发布至 npm 官方仓库，在终端直接运行：
+
+```bash
+dsh plugin --profile web add @utmotc/dshbalance
+```
+
+> 如果使用带社区安装统计的 `dsh1024` CLI，也可以运行：
+> `dsh1024 plugin --profile web add @utmotc/dshbalance`
+
+### 方式二：在 Web 界面安装
+
 在 dsh Web 界面打开侧边栏的**插件页**，把下面任意一条粘贴进安装框并确认：
 
-```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
-```
-
-这是当前 `main`。要可复现的安装，用 tag：
-
-```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
-```
-
-仓库地址（`https://github.com/Utmotc/dsh-plugin-balance`）也可以，但 pnpm 会把它按 **git** 依赖解析，机器上需要有 `git`；`archive/.../main.tar.gz` 形式是纯 HTTPS 下载。
+- **npm 包名**（推荐）：
+  ```
+  @utmotc/dshbalance
+  ```
+- **或 GitHub 归档包**：
+  ```
+  https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
+  ```
 
 安装会自动做三件事：
 
@@ -49,24 +59,10 @@ https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
 
 然后在同一页面打开或关闭它。一个声明了 `dsh.bundle` 的包才会进 bundles——这是插件必须做对的一件事，本插件做对了。
 
-升级：pnpm 按依赖串缓存，所以推送新版本后，在插件页卸载再重装（或装一个新 tag）。每次发布都固定一个 tag，可以彻底绕开这个问题。
-
-更喜欢终端的话，等价的手动操作：
-
+升级：由于已发布到 npm，后续升级只需在插件页点击更新，或执行：
 ```bash
-# 发布至 npm 后支持短命令安装
-dsh plugin --profile web add @utmotc/dshbalance
-
-# 或直接通过 GitHub 归档包安装
-dsh plugin --profile web add https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
+dsh plugin --profile web add @utmotc/dshbalance@latest
 ```
-
-这只安装**依赖**。激活是单独一步——CLI 不会动 `dsh.profile.bundles`（实测 manifest 原样返回）。两种方式任选收尾：
-
-- 打开插件页：包已列为 bundle，开关是**关**的——打开它；或
-- 自己把 `"@utmotc/dshbalance"` 加进 `$DSH_HOME/profiles/web/package.json` 的 `dsh.profile.bundles`。
-
-插件页自己的安装框一步做完两件事，所以它是推荐路径。
 
 ## 密钥从哪来
 
