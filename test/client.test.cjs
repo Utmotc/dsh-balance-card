@@ -1696,7 +1696,8 @@ const main = async () => {
     const cardText = texts(card).join('')
     console.log('V6 folded card:', JSON.stringify(cardText))
     assert.ok(cardText.includes('gemini \u7cfb\u5217'), 'the folded gemini row is labelled gemini 系列')
-    assert.ok(cardText.includes('\u5269\u4f59 70%'), 'the folded row carries the family\u2019s tightest share')
+    assert.ok(cardText.includes('70%'), 'the folded row carries the family\u2019s tightest share (right column only)')
+    assert.ok(!cardText.includes('\u5269\u4f59 70%'), 'no duplicated 剩余 x% amount column beside the percentage')
     // Everything else is off the card: individual gemini models AND the
     // non-gemini lanes.
     assert.ok(!cardText.includes('gemini-3-pro'), 'individual gemini model names stay off the collapsed card')

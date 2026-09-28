@@ -64,7 +64,7 @@ Manual equivalent, if you prefer a terminal:
 
 ```bash
 # Once published to npm, install using the short package name
-dsh plugin --profile web add dshbalance
+dsh plugin --profile web add @utmotc/dshbalance
 
 # Or install directly from GitHub tarball
 dsh plugin --profile web add https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
@@ -73,7 +73,7 @@ dsh plugin --profile web add https://github.com/Utmotc/dsh-plugin-balance/archiv
 This installs the **dependency only**. Activating it is a separate step — the CLI does not touch `dsh.profile.bundles` (measured: the manifest comes back unchanged). Finish either way:
 
 - open the plugin page: the package is now listed as a bundle with its switch **off** — turn it on; or
-- add `"dshbalance"` to `dsh.profile.bundles` in `$DSH_HOME/profiles/web/package.json` yourself.
+- add `"@utmotc/dshbalance"` to `dsh.profile.bundles` in `$DSH_HOME/profiles/web/package.json` yourself.
 
 The plugin page's own install field does both steps at once, which is why it is the recommended path.
 

@@ -6,7 +6,7 @@
 # switch in the plugin page toggles this plugin for real.
 - insert:
     - id: balance-monitor
-      name: dshbalance
+      name: '@utmotc/dshbalance'
       config:
         # Credential reference holding the DeepSeek key; every other provider
         # names its own through the settings sections. Optional — the defaults
