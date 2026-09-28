@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.1
+
+- **Refinement: Antigravity shared-pool folding on collapsed sidebar card.**
+  When Google Antigravity reports multiple `gemini-*` model windows, their quotas
+  belong to the same shared pool and move together. The collapsed sidebar card now
+  cleanly folds them into a single `gemini 系列` bar showing the tightest remaining
+  share and earliest reset time, preventing repetitive entries from overflowing
+  the card. The full list of individual models and lanes remains accessible in
+  the detail panel.
+
 ## 1.3.0
 
 - **Feature: full support for `dsh-plugin-subscriptions` monitoring.**

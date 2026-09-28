@@ -1588,6 +1588,8 @@ const main = async () => {
       },
     }
     // Two accounts × three windows each = six window bars, far past three.
+    // The two gemini-* scopes fold into one shared-pool row on the card (see
+    // V6), so the default account draws two bars: gemini 系列 + claude lane.
     const windowsOf = (offset) =>
       ['gemini-3-pro', 'gemini-3-flash', 'claude-sonnet-4-6'].map((model, index) => ({
         kind: 'other',
@@ -1611,18 +1613,18 @@ const main = async () => {
     const card = await monitor.renderSidebar()
     const cardText = texts(card).join('')
     console.log('V5 capped card:', JSON.stringify(cardText))
-    // Exactly three window bars are drawn: the default account's three windows.
-    for (const expected of ['a@gmail.com \u00b7 Google AI Pro', 'gemini-3-pro', 'gemini-3-flash', 'claude-sonnet-4-6']) {
-      assert.ok(cardText.includes(expected), 'the capped card must show the default account\u2019s windows (' + expected + ')')
-    }
-    assert.ok(
-      !cardText.includes('b@gmail.com'),
-      'the second account\u2019s windows are cut from the collapsed card',
-    )
-    assert.ok(cardText.includes('\u8fd8\u6709 3 \u9879'), 'the cut count is stated')
-    assert.ok(cardText.includes('\u70b9\u5361\u67e5\u770b\u5168\u90e8'), 'the pointer to the detail panel is stated')
+    // The card draws ONLY the shared gemini pool per account — one bar each.
+    // The claude lane and the individual gemini model names stay off the card.
+    assert.ok(cardText.includes('a@gmail.com \u00b7 Google AI Pro'), 'the default account head shows')
+    assert.ok(cardText.includes('gemini \u7cfb\u5217'), 'the shared-pool row shows')
+    assert.ok(!cardText.includes('claude-sonnet-4-6'), 'a non-gemini lane stays off the collapsed card')
+    assert.ok(!cardText.includes('gemini-3-pro'), 'individual gemini model names stay off the collapsed card')
+    assert.ok(cardText.includes('b@gmail.com'), 'the second account keeps its own shared-pool row')
+    // Six raw windows fold to two shared-pool rows — inside the cap, so no
+    // cut-count line appears.
+    assert.strictEqual(cardText.includes('\u8fd8\u6709'), false, 'no cut-count line: both accounts fit their one row')
 
-    // The bars on the card: three window fills only.
+    // The bars on the card: one shared-pool bar per account.
     const bars = []
     const collectBars = (node) => {
       if (node === null || typeof node !== 'object') return
@@ -1631,7 +1633,7 @@ const main = async () => {
       if (node.props) collectBars(node.props.children)
     }
     collectBars(card)
-    assert.strictEqual(bars.length, 3, 'exactly three window bars on the collapsed card')
+    assert.strictEqual(bars.length, 2, 'exactly one shared-pool bar per account')
 
     // Opening the panel lists every account and every window, all six bars' data.
     card.props.onClick()
@@ -1648,6 +1650,78 @@ const main = async () => {
     // (the window name also appears in its 重置 row, so count those pairs).
     const occurrences = panelText.split('gemini-3-pro').length - 1
     assert.strictEqual(occurrences, 4, 'each account lists its own window set (window row + its reset row)')
+  }
+
+  // V6: GEMINI POOL FOLD. Antigravity reports one window per model, but its
+  // gemini-* models share one pool — the percentages move together. The
+  // collapsed card draws ONLY the family as one row (the tightest share,
+  // labelled gemini 系列); every per-model lane, gemini or not, stays in the
+  // detail panel.
+  {
+    const STATUS = {
+      providers: {
+        antigravity: {
+          busy: false,
+          accounts: [{ key: 'acct-1', isDefault: true, account: 'a@gmail.com', plan: 'Google AI Pro' }],
+        },
+      },
+    }
+    // Four gemini-* windows at slightly different percentages (same pool, so
+    // they move together) plus two genuinely separate lanes.
+    const USAGE = {
+      supported: true,
+      windows: [
+        { kind: 'other', scope: 'gemini-3-pro', usedPercent: 30 },
+        { kind: 'other', scope: 'gemini-3.6-flash-high', usedPercent: 30 },
+        { kind: 'other', scope: 'gemini-3.5-flash-lite', usedPercent: 28 },
+        { kind: 'other', scope: 'gemini-2.5-pro', usedPercent: 30 },
+        { kind: 'other', scope: 'claude-sonnet-4-6', usedPercent: 55 },
+        { kind: 'other', scope: 'gpt-oss-120b-medium', usedPercent: 12 },
+      ],
+    }
+    const DIRECTORY_ANTIGRAVITY = {
+      current: { provider: 'antigravity', model: 'gemini-3-pro' },
+      groups: [{ id: 'antigravity', name: 'Google Antigravity' }],
+      routable: true,
+      status: 'ready',
+    }
+    const subscriptionsHandler = (payload) => {
+      if (payload.provider === undefined) return { ok: true, value: { providers: STATUS.providers } }
+      return { ok: true, value: USAGE }
+    }
+    const harness = load((url) => assert.fail(url), { subscriptionsHandler })
+    const monitor = harness.mount({ settings: SIDEBAR, models: modelsStub(store(DIRECTORY_ANTIGRAVITY), store(CATALOG)) })
+    await monitor.attachSession('session-1')
+    const card = await monitor.renderSidebar()
+    const cardText = texts(card).join('')
+    console.log('V6 folded card:', JSON.stringify(cardText))
+    assert.ok(cardText.includes('gemini \u7cfb\u5217'), 'the folded gemini row is labelled gemini 系列')
+    assert.ok(cardText.includes('\u5269\u4f59 70%'), 'the folded row carries the family\u2019s tightest share')
+    // Everything else is off the card: individual gemini models AND the
+    // non-gemini lanes.
+    assert.ok(!cardText.includes('gemini-3-pro'), 'individual gemini model names stay off the collapsed card')
+    assert.ok(!cardText.includes('claude-sonnet-4-6'), 'a non-gemini lane stays off the collapsed card')
+    assert.ok(!cardText.includes('gpt-oss-120b-medium'), 'a second non-gemini lane stays off the collapsed card')
+    const bars = []
+    const collectBars = (node) => {
+      if (node === null || typeof node !== 'object') return
+      if (Array.isArray(node)) return node.forEach(collectBars)
+      if (node.props?.className === 'dshBal_bar') bars.push(node)
+      if (node.props) collectBars(node.props.children)
+    }
+    collectBars(card)
+    assert.strictEqual(bars.length, 1, 'the collapsed card draws exactly one shared-pool bar')
+    assert.strictEqual(cardText.includes('\u8fd8\u6709'), false, 'no cut-count line: the panel, not the cap, holds the rest')
+
+    // The detail panel lists every window, each gemini model and lane by name.
+    card.props.onClick()
+    const opened = await monitor.rerenderSidebar()
+    const panelText = texts(find(opened, (n) => n.props?.role === 'dialog')).join('')
+    console.log('V6 panel:', JSON.stringify(panelText))
+    for (const model of ['gemini-3-pro', 'gemini-3.6-flash-high', 'gemini-3.5-flash-lite', 'gemini-2.5-pro', 'claude-sonnet-4-6', 'gpt-oss-120b-medium']) {
+      assert.ok(panelText.includes(model), 'the panel lists every window (' + model + ')')
+    }
+    assert.ok(!panelText.includes('gemini \u7cfb\u5217'), 'the panel never shows the folded label')
   }
 
   console.log('OK: boot-safe activation, one pill following the selected model, placement, degradation and panels verified')

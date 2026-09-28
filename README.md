@@ -36,7 +36,7 @@ https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
 这是当前 `main`。要可复现的安装，用 tag：
 
 ```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.0.tar.gz
+https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
 ```
 
 仓库地址（`https://github.com/Utmotc/dsh-plugin-balance`）也可以，但 pnpm 会把它按 **git** 依赖解析，机器上需要有 `git`；`archive/.../main.tar.gz` 形式是纯 HTTPS 下载。

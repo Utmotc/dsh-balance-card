@@ -45,7 +45,7 @@ https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
 That is the current `main`. For a reproducible install, use a tag instead:
 
 ```
-https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.0.tar.gz
+https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
 ```
 
 The repository URL (`https://github.com/Utmotc/dsh-plugin-balance`) works too, but pnpm resolves it as a **git** dependency, so it needs `git` on the machine; the `archive/.../main.tar.gz` form is a plain HTTPS download.
