@@ -33,7 +33,7 @@ Switching models switches the card with it. Clicking the card opens the detail p
 
 ## Install
 
-Requires **dsh 0.1.7 or newer**, Node 22+.
+Requires **dsh 0.1.7 or newer**, Node 18+.
 
 In the dsh Web GUI, open the **plugin page** in the sidebar, paste one of these into the install field, and confirm:
 
