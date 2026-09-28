@@ -4,18 +4,15 @@
 
 把各厂商的 **API 余额，常驻在 dsh Web 侧边栏**：一张贴在设置按钮上方的卡片，显示**当前会话**所用模型背后那个厂商的余额——带环形进度、百分比、每个套餐各自的进度条，以及最后更新时间。
 
-<img width="305" height="184" alt="image" src="https://github.com/user-attachments/assets/30b97716-b4bf-4ce5-906a-946be9c658d2" />
-<img width="300" height="100" alt="image" src="https://github.com/user-attachments/assets/ec604fa6-9d83-4984-9f94-d92ebfa44a9c" />
-<img width="300" height="64" alt="image" src="https://github.com/user-attachments/assets/aeeeabc3-21a1-4524-a9c6-6a5baa47cca8" />
+<img width="300" height="126" alt="image" src="https://github.com/user-attachments/assets/30b0f402-e1f5-41fc-97c7-a1388d4245ce" />
+<img width="298" height="109" alt="image" src="https://github.com/user-attachments/assets/d7382730-31ce-435c-b5de-c84e4242c95c" />
+<img width="306" height="83" alt="image" src="https://github.com/user-attachments/assets/7b32d4ca-6f5b-4abd-b209-e28af22f6997" />
+
 
 
 切换模型，卡片跟着切换。点击卡片**原地**展开详情面板——不发生任何页面跳转，会话保持在原处。
 
-```
-¥ DeepSeek余额 4.19        ← 读厂商自己的账单接口
-🎫 WorkBuddy积分 1,261      ← 复读 dsh-workbuddy-connect 已发布的剩余积分
-🎫 Qoder积分 100            ← 复读 dsh-qoder-connect 已发布的剩余积分
-```
+<img width="345" height="655" alt="image" src="https://github.com/user-attachments/assets/cefc05cb-8eb3-4404-8059-f0875dea8ca4" />
 
 - **六家厂商，各自的官方账单接口**——DeepSeek、StepFun、Kimi Coding、OpenRouter、MiniMax、xAI/Grok——外加你在 `providers.json` 里声明的任意厂商。
 - **WorkBuddy 与 Qoder 的积分，不重复实现。** 选中 `workbuddy` / `workbuddy-ai` 或 `qoder` / `qoder-global` 模型组时，显示的是 `dsh-workbuddy-connect` / `dsh-qoder-connect` 已经发布在自己状态路由上的剩余积分。
