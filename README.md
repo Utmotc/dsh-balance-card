@@ -4,14 +4,10 @@
 
 把各厂商的 **API 余额，常驻在 dsh Web 侧边栏**：一张贴在设置按钮上方的卡片，显示**当前会话**所用模型背后那个厂商的余额——带环形进度、百分比、每个套餐各自的进度条，以及最后更新时间。
 
-```
-╭──────────────────────────────────────╮
-│ ◔ DeepSeek余额              ¥4.19  ⏱ │   ← 侧边栏卡片
-│   账户余额      ¥4.19 / ¥10.00   42% │
-│   ████████░░░░░░░░░░░░░░░░░░░░░░░░░  │
-╰──────────────────────────────────────╯
-   ⚙ 设置
-```
+<img width="305" height="184" alt="image" src="https://github.com/user-attachments/assets/30b97716-b4bf-4ce5-906a-946be9c658d2" />
+<img width="300" height="100" alt="image" src="https://github.com/user-attachments/assets/ec604fa6-9d83-4984-9f94-d92ebfa44a9c" />
+<img width="300" height="64" alt="image" src="https://github.com/user-attachments/assets/aeeeabc3-21a1-4524-a9c6-6a5baa47cca8" />
+
 
 切换模型，卡片跟着切换。点击卡片**原地**展开详情面板——不发生任何页面跳转，会话保持在原处。
 
