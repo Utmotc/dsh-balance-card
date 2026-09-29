@@ -1,5 +1,5 @@
 /**
- * Host-half self-check for dsh-plugin-balance.
+ * Host-half self-check for dsh-balance-card.
  *
  * Loads the real plugin module, hands it a fake context, and drives the
  * authenticated route handler directly. No DSH process, no network, no keys.

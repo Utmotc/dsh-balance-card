@@ -1,4 +1,4 @@
-# dsh-plugin-balance
+# dsh-balance-card
 
 [English](./README.en.md) | 简体中文
 
@@ -32,11 +32,11 @@
 本插件已正式发布至 npm 官方仓库，在终端直接运行：
 
 ```bash
-dsh plugin --profile web add @utmotc/dshbalance
+dsh plugin --profile web add @utmotc/dsh-balance-card
 ```
 
 > 如果使用带社区安装统计的 `dsh1024` CLI，也可以运行：
-> `dsh1024 plugin --profile web add @utmotc/dshbalance`
+> `dsh1024 plugin --profile web add @utmotc/dsh-balance-card`
 
 ### 方式二：在 Web 界面安装
 
@@ -44,11 +44,11 @@ dsh plugin --profile web add @utmotc/dshbalance
 
 - **npm 包名**（推荐）：
   ```
-  @utmotc/dshbalance
+  @utmotc/dsh-balance-card
   ```
 - **或 GitHub 归档包**：
   ```
-  https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
+  https://github.com/Utmotc/dsh-balance-card/archive/refs/tags/v1.4.0.tar.gz
   ```
 
 安装会自动做三件事：
@@ -61,7 +61,7 @@ dsh plugin --profile web add @utmotc/dshbalance
 
 升级：由于已发布到 npm，后续升级只需在插件页点击更新，或执行：
 ```bash
-dsh plugin --profile web add @utmotc/dshbalance@latest
+dsh plugin --profile web add @utmotc/dsh-balance-card@latest
 ```
 
 ## 密钥从哪来
@@ -236,12 +236,12 @@ id 覆盖内置 endpoint 的方法。
 
 这个包可以直接从 GitHub 安装；不需要构建，也不需要发布到 npm。
 
-1. 创建 GitHub 仓库 `Utmotc/dsh-plugin-balance` 并推送：
+1. 创建 GitHub 仓库 `Utmotc/dsh-balance-card` 并推送：
 
    ```bash
-   git init && git add . && git commit -m "dsh-plugin-balance 1.2.4"
+   git init && git add . && git commit -m "dsh-balance-card 1.4.0"
    git branch -M main
-   git remote add origin https://github.com/Utmotc/dsh-plugin-balance.git
+   git remote add origin https://github.com/Utmotc/dsh-balance-card.git
    git push -u origin main
    ```
 
@@ -254,13 +254,13 @@ id 覆盖内置 endpoint 的方法。
 3. 加 topic（仓库设置 → About ⚙ → Topics，或用命令行）：
 
    ```bash
-   gh repo edit Utmotc/dsh-plugin-balance --add-topic dsh-plugin --add-topic deepseek-harness
+   gh repo edit Utmotc/dsh-balance-card --add-topic dsh-plugin --add-topic deepseek-harness
    ```
 
 4. 用户在插件页用这个地址安装：
 
    ```
-   https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
+   https://github.com/Utmotc/dsh-balance-card/archive/refs/heads/main.tar.gz
    ```
 
 每次推送都更新 `package.json` 的 `version`，插件页的升级提示才会如实工作——
@@ -286,7 +286,7 @@ loader 行的 `config` 接受（全部可选——任何不可用的值回落到
 ### 用户设置（`余额监测` 页）
 
 从设置页进入——不需要 profile 补丁，不需要重启。文档存在本插件自己的文件里
-（`$DSH_HOME/dsh-plugin-balance/balance-settings.json`，或该行的
+（`$DSH_HOME/dsh-balance-card/balance-settings.json`，或该行的
 `settingsFile`），因为走 loader 行写设置会重建整个插件树并热重载 fiber
 （约 1–1.5 秒，外加一次客户端镜像风暴），每拨一个开关都要付一次这个代价。
 

@@ -1,4 +1,4 @@
-# dsh-plugin-balance bundle patch.
+# dsh-balance-card bundle patch.
 #
 # Installing this package as a profile bundle applies this file, which inserts the
 # plugin's own loader row. That is all it takes: the plugin manager adds a newly
@@ -6,7 +6,7 @@
 # switch in the plugin page toggles this plugin for real.
 - insert:
     - id: balance-monitor
-      name: '@utmotc/dshbalance'
+      name: '@utmotc/dsh-balance-card'
       config:
         # Credential reference holding the DeepSeek key; every other provider
         # names its own through the settings sections. Optional — the defaults

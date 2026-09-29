@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0
+
+- **Rename: the package is now `@utmotc/dsh-balance-card`** (previously
+  `@utmotc/dshbalance`). The GitHub repository is also renamed to
+  `Utmotc/dsh-balance-card`. The internal dsh loader id (`balance-monitor`)
+  is unchanged, so an existing install's loader row keeps working. User
+  settings now live under `$DSH_HOME/dsh-balance-card/` instead of
+  `dsh-plugin-balance/`.
+
 ## 1.3.1
 
 - **Fix: clean subscription progress bar and percentage layout.**
@@ -109,7 +118,7 @@ A sidebar card, a settings tab, strict unit handling, and Qoder credit support.
 - **A `余额监测` settings tab** on the settings page, with no profile patch and no
   restart: placement (sidebar / composer / both), poll interval, warning threshold,
   unit style, updated-time and digit grouping. The document is this plugin's own
-  file (`$DSH_HOME/dsh-plugin-balance/balance-settings.json`), so a write is a local
+  file (`$DSH_HOME/dsh-balance-card/balance-settings.json`), so a write is a local
   atomic file write rather than a loader reconcile and fiber hot-reload.
 - **Qoder credit support.** `qoder` and `qoder-global` are answered by re-reading
   `dsh-qoder-connect`'s own status routes, the same way WorkBuddy already was.

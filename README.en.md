@@ -1,4 +1,4 @@
-# dsh-plugin-balance
+# dsh-balance-card
 
 English | [简体中文](./README.md)
 
@@ -41,11 +41,11 @@ Requires **dsh 0.1.7 or newer**, Node **22.19+** (or 24+) — the same requireme
 This plugin is published on the official npm registry. Install it directly from your terminal:
 
 ```bash
-dsh plugin --profile web add @utmotc/dshbalance
+dsh plugin --profile web add @utmotc/dsh-balance-card
 ```
 
 > If using the community `dsh1024` CLI wrapper:
-> `dsh1024 plugin --profile web add @utmotc/dshbalance`
+> `dsh1024 plugin --profile web add @utmotc/dsh-balance-card`
 
 ### Option 2: Install via the Web GUI
 
@@ -53,11 +53,11 @@ In the dsh Web GUI, open the **plugin page** in the sidebar, paste one of these 
 
 - **npm package spec** (Recommended):
   ```
-  @utmotc/dshbalance
+  @utmotc/dsh-balance-card
   ```
 - **Or GitHub release archive**:
   ```
-  https://github.com/Utmotc/dsh-plugin-balance/archive/refs/tags/v1.3.1.tar.gz
+  https://github.com/Utmotc/dsh-balance-card/archive/refs/tags/v1.4.0.tar.gz
   ```
 
 Installing automatically does three things:
@@ -70,7 +70,7 @@ Then switch it on or off from the same page. A package that declares `dsh.bundle
 
 Upgrades: Since it is on npm, subsequent updates can be done with one command:
 ```bash
-dsh plugin --profile web add @utmotc/dshbalance@latest
+dsh plugin --profile web add @utmotc/dsh-balance-card@latest
 ```
 
 ## Where the keys come from
@@ -223,12 +223,12 @@ For a vendor every user should get by default, add a parser to `STRATEGIES` in `
 
 The package is installable straight from GitHub; nothing needs to be built or published to npm.
 
-1. Create the GitHub repository `Utmotc/dsh-plugin-balance` and push:
+1. Create the GitHub repository `Utmotc/dsh-balance-card` and push:
 
    ```bash
-   git init && git add . && git commit -m "dsh-plugin-balance 1.2.4"
+   git init && git add . && git commit -m "dsh-balance-card 1.4.0"
    git branch -M main
-   git remote add origin https://github.com/Utmotc/dsh-plugin-balance.git
+   git remote add origin https://github.com/Utmotc/dsh-balance-card.git
    git push -u origin main
    ```
 
@@ -241,13 +241,13 @@ The package is installable straight from GitHub; nothing needs to be built or pu
 3. Add the topic (repository settings → About ⚙ → Topics, or):
 
    ```bash
-   gh repo edit Utmotc/dsh-plugin-balance --add-topic dsh-plugin --add-topic deepseek-harness
+   gh repo edit Utmotc/dsh-balance-card --add-topic dsh-plugin --add-topic deepseek-harness
    ```
 
 4. Users install from the plugin page with:
 
    ```
-   https://github.com/Utmotc/dsh-plugin-balance/archive/refs/heads/main.tar.gz
+   https://github.com/Utmotc/dsh-balance-card/archive/refs/heads/main.tar.gz
    ```
 
 Updating `package.json`'s `version` on every push keeps the plugin page's upgrade notice honest, since pnpm caches by spec string.
@@ -270,7 +270,7 @@ There is deliberately **no config schema export**: a schema would mean importing
 
 ### User settings (`余额监测` tab)
 
-Reachable from the settings page — no profile patch and no restart. The document lives in this plugin's own file (`$DSH_HOME/dsh-plugin-balance/balance-settings.json`, or the row's `settingsFile`), because a write through the loader row would reconcile the whole plugin tree and hot-reload the fiber (~1–1.5 s plus a client mirror storm) for every toggled switch.
+Reachable from the settings page — no profile patch and no restart. The document lives in this plugin's own file (`$DSH_HOME/dsh-balance-card/balance-settings.json`, or the row's `settingsFile`), because a write through the loader row would reconcile the whole plugin tree and hot-reload the fiber (~1–1.5 s plus a client mirror storm) for every toggled switch.
 
 | Field | Default | Values |
 |---|---|---|

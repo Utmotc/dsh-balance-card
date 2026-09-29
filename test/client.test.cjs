@@ -385,7 +385,7 @@ const load = (route, options = {}) => {
   vm.createContext(sandbox)
   vm.runInContext(fs.readFileSync(BUNDLE, 'utf8'), sandbox, { filename: 'client.js' })
   assert.ok(registration, 'bundle must register a factory')
-  assert.strictEqual(registration.id, 'dsh-plugin-balance')
+  assert.strictEqual(registration.id, '@utmotc/dsh-balance-card')
   const exports = registration.factory(sandbox.require)
 
   /**
