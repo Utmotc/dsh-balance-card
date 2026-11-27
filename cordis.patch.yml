@@ -1,20 +1,21 @@
 # dsh-balance-card bundle patch.
 #
-# Installing this package as a profile bundle applies this file, which inserts the
-# plugin's own loader row. That is all it takes: the plugin manager adds a newly
-# installed bundle to `dsh.profile.bundles` by itself, so the row appears and its
-# switch in the plugin page toggles this plugin for real.
+# 安装本包为 profile bundle 时，这个文件把插件自己的 loader 行插入配置。
+# 其余能力都是运行时设置（设置页 → 01 卡片样式 / 02 厂商监控 / 03 其他工具），
+# 由插件自己的 balance-settings-v2.json 承载，不写 loader、不重启插件树。
+#
+# 可选的行配置：
+#   settingsFile: ...        # balance-settings-v2.json 的绝对路径
+#   throttleStateFile: ...   # throttle-state.json 的绝对路径（限流学习状态）
+#   timeoutMs: 15000         # 单次厂商请求超时
+#
+# 凭据只存在 DSH 凭据库（~/.dsh/.credentials.yaml 由 DSH 管理），不写在这里：
+#   DEEPSEEK_API_KEY / STEPFUN_API_KEY / KIMI_API_KEY / OPENROUTER_API_KEY
+#   MINIMAX_API_KEY / XAI_API_KEY / SILICONFLOW_API_KEY
+#   BAIDU_QIANFAN_COOKIE / SCNET_COOKIE / MIMO_COOKIE / QWEN_COOKIE
+#   ZAI_API_KEY（或 BIGMODEL_API_KEY）/ VOLC_ACCESSKEY + VOLC_SECRETKEY
+#   ANTHROPIC_OAUTH_TOKEN / OPENAI_CODEX_API_KEY / ANTIGRAVITY_TOKEN
 - insert:
     - id: balance-monitor
       name: '@utmotc/dsh-balance-card'
-      config:
-        # Credential reference holding the DeepSeek key; every other provider
-        # names its own through the settings sections. Optional — the defaults
-        # below are what a bare install uses.
-        # apiKeyEnv: DEEPSEEK_API_KEY
-        # baseURL: https://api.deepseek.com   # or set $DEEPSEEK_BASE_URL
-        # timeoutMs: 15000                    # per-request timeout against the provider
-        # minIntervalMs: 2000                 # floor between two upstream reads of one provider
-        # okTtlMs: 60000                      # how long a good reading is reused
-        # errorTtlMs: 15000                   # how long a failed reading is reused
-        # defaultProvider: deepseek           # answered when a request names none
+      config: {}
