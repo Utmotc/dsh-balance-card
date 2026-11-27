@@ -5,6 +5,7 @@
 自包含：只依赖 DSH 的 `credentials` 与 `connection`，不调用任何其他插件、不读其他插件的环回路由。四种卡片风格、三页设置、21 家厂商直连都在本插件内闭环。
 
 [![release](https://img.shields.io/github/v/release/Utmotc/dsh-balance-card?include_prereleases&label=release)](https://github.com/Utmotc/dsh-balance-card/releases)
+[![npm](https://img.shields.io/npm/v/@utmotc/dsh-balance-card?label=npm)](https://www.npmjs.com/package/@utmotc/dsh-balance-card)
 [![license](https://img.shields.io/github/license/Utmotc/dsh-balance-card)](LICENSE)
 [![dsh-plugin](https://img.shields.io/badge/dsh-plugin-2.0.0-4D6BFE)](https://github.com/topics/dsh-plugin)
 
@@ -34,9 +35,17 @@
 
 要求 **dsh 0.1.7 或更新**，Node **22.19+**（或 24+）。
 
-> 2.0 的安装源是 GitHub Release；npm 包同步后也可按包名安装。
+> npm 2.0.0 与 GitHub `v2.0.0` 是同一份代码，两种安装源任选。
 
 ### 终端安装（推荐）
+
+npm 包名：
+
+```bash
+dsh plugin --profile <profile> add @utmotc/dsh-balance-card
+```
+
+或固定 GitHub 标签：
 
 ```bash
 dsh plugin --profile <profile> add https://github.com/Utmotc/dsh-balance-card/archive/refs/tags/v2.0.0.tar.gz
@@ -46,7 +55,7 @@ dsh plugin --profile <profile> add https://github.com/Utmotc/dsh-balance-card/ar
 
 ### Web 界面安装
 
-打开 dsh Web 侧边栏的**插件页**，把同一条 GitHub 标签地址粘贴进安装框并确认。
+打开 dsh Web 侧边栏的**插件页**，粘贴 npm 包名 `@utmotc/dsh-balance-card`，或上面的 GitHub 标签地址，确认安装。
 
 ### 本地开发
 
@@ -58,13 +67,13 @@ Host 代码改动后重启 dsh；只改浏览器半边时刷新页面即可。
 
 ### 升级
 
-重新安装新标签：
+npm：
 
 ```bash
-dsh plugin --profile <profile> add https://github.com/Utmotc/dsh-balance-card/archive/refs/tags/v2.0.0.tar.gz
+dsh plugin --profile <profile> add @utmotc/dsh-balance-card@latest
 ```
 
-升级不会清除 `balance-settings-v2.json`、凭据或限流状态。
+或重新安装新标签。升级不会清除 `balance-settings-v2.json`、凭据或限流状态。
 
 ## 三页设置
 
@@ -273,7 +282,7 @@ node test/bench-throttle.mjs # 可选
 
 ## 发布 npm（可选）
 
-市场收录不依赖 npm；发布后可显示下载量。2.0 需要单独发布：
+市场收录不依赖 npm；发布后可显示下载量。2.0.0 已发布到 npm。后续版本：
 
 ```bash
 npm publish --access public
